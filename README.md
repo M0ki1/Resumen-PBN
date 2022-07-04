@@ -385,6 +385,8 @@ clean:
 
 Donde ***\*.out*** es para linux y ***\*.exe*** es para windows.
 
+*Agregar también que para borrar cosas en windows, no es **rm** es **del***
+
 ```makefile
 cc=g++
 flag=-std=c++11 -Wall -Wextra -Wundef -Werror -Wuninitialized -Winit-self
@@ -681,3 +683,153 @@ Aquí realmente no es necesario crear un makefile, podemos ingresar las comandos
 
 # Librerias
 
+## Compilacion dinamica de Headers.
+
+Ok esta es la parte que quizas menos entiendo pero hare mi mayor esfuerzo por explicarlo. 
+
+### -fPIC.
+
+---
+
+Para lograr hacer una **libreria** hay un concepto importante que tenemos que tener en cuenta, cuando nosotros compilamos con los comandos del g++, es decir hacemos `g++ main.cpp` estamos creando codigo ***Estatico***.
+
+La palabra estatico hace referencia a que todos los **comandos de headers/librerias** **externas** que nosotros usemos, digase por ejemplo nuestro `persona.h` tienen sus comandos en un **espacio especifico de la memoria de nuestro pc**. Claramente cuando tratamos de hacer librerias para que alguien más las utilice, **no** va a tener estos archivos en el mismo espacio de memoria que el nuestro.
+
+Para lograr que esto no se así y nuestras librerias sean ***Dinamicas*** debemos agregar el siguiente comando al momento de compilar: `-fPIC`
+
+```makefile
+cc=g++
+flag=-std=c++11 -Wall -Wextra -Wundef -Werror -Wuninitialized -Winit-self
+exe=salida
+
+main: persona.o main.cpp
+	$(cc) $(flag) main.cpp persona.o -o $(exe)
+
+persona.o: persona.cpp persona.h
+	$(cc) $(flag) -fPIC -c persona.cpp -o persona.o
+run: main.o
+	./$(exe).out
+clean:
+	rm *.o *.out *.exe
+```
+
+Es importante ver que solo le agregaremos esto a los binarios que estamos haciendo, en este caso particular solo es a **persona.o** `$(cc) $(flag) -fPIC -c persona.cpp -o persona.o`.
+
+## Compilar Header a libreria.
+
+Para hacer una librería deberemos agregar una regla nueva, que se **llamara igual que la libreria** **que queramos crear**, en este caso será ***persona*** y se le debe anteponer el **prefijo lib**, si no por alguna razón no función. Quedaría entonces como **libpersona.dll** `lib=libpersona.dll`
+
+debemos notar que se usa la extensión ***.dll*** para las librerias en windows y *.**so*** en Linux.
+
+```makefile
+cc=g++
+flag=-std=c++11 -Wall -Wextra -Wundef -Werror -Wuninitialized -Winit-self
+exe=salida
+lib=libpersona.dll
+
+main: persona.o main.cpp
+	$(cc) $(flag) main.cpp persona.o -o $(exe)
+
+$(lib): persona.o
+	$(cc) $(flags) -shared persona.o -o $(lib)
+	
+persona.o: persona.cpp persona.h
+	$(cc) $(flag) -fPIC -c persona.cpp -o persona.o
+	
+run: main.o
+	./$(exe).out
+	
+clean:
+	rm *.o *.out *.exe
+```
+
+*Ok*, de buenas a primeras tenemos que ver que se creo la regla `$(lib)`
+
+```makefile
+$(lib): persona.o
+	$(cc) $(flags) -shared persona.o -o $(lib)
+```
+
+Es importante ver que acá las dependencias seran todos los `.o` que tengamos, en este caso solo es uno, lo siguiente es que se le agrega la flag **`-shared`** realmente no se que significa pero es totalmente necesario
+
+## Compliacion del main como binario.
+
+Por razones que desconosco realmente, el main debe compilarse como binario, es decir con una extension `.o` asi que debemos cambiar su regla de compilación
+
+```makefile
+main.o: persona.o main.cpp
+	$(cc) $(flag) -c main.cpp persona.o -o main.o
+```
+
+Notemos que cambiamos el nombre del archivo a main.o al igual que la regla.
+
+```makefile
+cc=g++
+flag=-std=c++11 -Wall -Wextra -Wundef -Werror -Wuninitialized -Winit-self
+exe=salida
+lib=libpersona.dll
+
+main.o: persona.o main.cpp
+	$(cc) $(flag) -c main.cpp persona.o -o main.o
+
+$(lib): persona.o
+	$(cc) $(flags) -shared persona.o -o $(lib)
+	
+persona.o: persona.cpp persona.h
+	$(cc) $(flag) -fPIC -c persona.cpp -o persona.o
+	
+run: main.o
+	./$(exe).out
+	
+clean:
+	rm *.o *.out *.exe
+```
+
+
+
+## Compilación del main usando libreria.
+
+Ahora viene la parte final de las librerias, compilar el main binario para hacerlo un ejecutable, haciendo uso de estas. vamos a agregarle las siguientes 
+
+* **-L.** : Lo que hace esta flag es que le dice al compilador que se usara una libreria que esta en esta misma carpeta. **El punto es importantisimo ya que este le indica que esta en la carpeta**.
+* **-lnombreLibreria**: Con esto le estamos diciendo al compilador cual es el nombre de la libreria que debe buscar y usar para compilar. en nuestro caso seria ***-lpersona***.
+* **-Wl, ** : Wl es el linker que se usa, no se mucho de este.
+* **-rpath=.** : Esto lo que hace es decirle al linker que añada esta carpeta a donde debe buscar por librerias.
+
+Estos cambios van en una nueva regla que llamaremos igual que la variable ***exe***.
+
+```makefile
+$(exe): main.o $(lib)
+	$(cc) $(flags) main.o -o $(exe) -L. -lpersona -Wl, -rpath=. 
+```
+
+Las dependencias de este van a ser claramente nuestro `main.o` y tambien nuestra libreria que seria `libpersona.dll`.
+
+Finalmente nuestro makefile se veria asi:
+
+```makefile
+cc=g++
+flag=-std=c++11 -Wall -Wextra -Wundef -Werror -Wuninitialized -Winit-self
+exe=salida
+lib=libpersona.dll
+
+$(exe): main.o $(lib)
+	$(cc) $(flags) main.o -o $(exe) -L. -lpersona -Wl, -rpath=. 
+
+main.o: persona.o main.cpp
+	$(cc) $(flag) -c main.cpp persona.o -o main.o
+
+$(lib): persona.o
+	$(cc) $(flags) -shared persona.o -o $(lib)
+	
+persona.o: persona.cpp persona.h
+	$(cc) $(flag) -fPIC -c persona.cpp -o persona.o
+	
+run: $(exe)
+	./$(exe).out
+	
+clean:
+	rm *.o *.out *.exe *.dll
+```
+
+Hay que ver que se le agrego el a la regla **run**  la dependecia de la regla **exe** y se añadio al clean un ***.dll*** 
