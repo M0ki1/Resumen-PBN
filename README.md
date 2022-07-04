@@ -69,7 +69,7 @@ En otras palabras suponiendo que tenemos un archivo llamado`resumen.h` en nuestr
   ```
 
   Les dejo una tabla con los metodos mas importantes:
-  
+
   <table class="alt">
   <tbody><tr><th>No.</th><th>Function</th><th>Description</th></tr>
   <tr><td>1)</td><td><a href="c-strlen">strlen(string_name)</a></td><td>returns the length of string name.</td></tr>
@@ -80,7 +80,7 @@ En otras palabras suponiendo que tenemos un archivo llamado`resumen.h` en nuestr
   <tr><td>6)</td><td><a href="c-strlwr">strlwr(string)</a></td><td>returns string characters in lowercase.</td></tr>
   <tr><td>7)</td><td><a href="c-strupr">strupr(string)</a></td><td>returns string characters in uppercase.</td></tr>
   </tbody></table>
-  
+
   
 
 ---
@@ -152,6 +152,7 @@ Les dejo una tabla que encontré bonita con los métodos mas importantes **uwu**
 </td>
 </tr>
 </tbody></table>
+
 
 ---
 
@@ -278,7 +279,6 @@ Ok los headers son archivos con una extención `.h` que nos permite declarar fun
 ---
 
 ```c++
-
 
 
 int suma(int x,int y);
@@ -681,9 +681,9 @@ Aquí realmente no es necesario crear un makefile, podemos ingresar las comandos
 
 
 
-# Librerias
+# Librerías
 
-## Compilacion dinamica de Headers.
+## Compilación dinámica de Headers.
 
 Ok esta es la parte que quizas menos entiendo pero hare mi mayor esfuerzo por explicarlo. 
 
@@ -691,11 +691,11 @@ Ok esta es la parte que quizas menos entiendo pero hare mi mayor esfuerzo por ex
 
 ---
 
-Para lograr hacer una **libreria** hay un concepto importante que tenemos que tener en cuenta, cuando nosotros compilamos con los comandos del g++, es decir hacemos `g++ main.cpp` estamos creando codigo ***Estatico***.
+Para lograr hacer una **librería** hay un concepto importante que tenemos que tener en cuenta, cuando nosotros compilamos con los comandos del g++, es decir hacemos `g++ main.cpp` estamos creando código ***Estático***.
 
-La palabra estatico hace referencia a que todos los **comandos de headers/librerias** **externas** que nosotros usemos, digase por ejemplo nuestro `persona.h` tienen sus comandos en un **espacio especifico de la memoria de nuestro pc**. Claramente cuando tratamos de hacer librerias para que alguien más las utilice, **no** va a tener estos archivos en el mismo espacio de memoria que el nuestro.
+La palabra estático hace referencia a que todos los **comandos de headers/librerias** **externas** que nosotros usemos, dígase por ejemplo nuestro `persona.h` tienen sus comandos en un **espacio especifico de la memoria de nuestro pc**. Claramente cuando tratamos de hacer librerías para que alguien más las utilice, **no** va a tener estos archivos en el mismo espacio de memoria que el nuestro.
 
-Para lograr que esto no se así y nuestras librerias sean ***Dinamicas*** debemos agregar el siguiente comando al momento de compilar: `-fPIC`
+Para lograr que esto no se así y nuestras librerías sean ***Dinámicas*** debemos agregar el siguiente comando al momento de compilar: `-fPIC`
 
 ```makefile
 cc=g++
@@ -752,9 +752,9 @@ $(lib): persona.o
 
 Es importante ver que acá las dependencias seran todos los `.o` que tengamos, en este caso solo es uno, lo siguiente es que se le agrega la flag **`-shared`** realmente no se que significa pero es totalmente necesario
 
-## Compliacion del main como binario.
+## Compilación del main como binario.
 
-Por razones que desconosco realmente, el main debe compilarse como binario, es decir con una extension `.o` asi que debemos cambiar su regla de compilación
+Por razones que desconozco realmente, el main debe compilarse como binario, es decir con una extensión `.o` asi que debemos cambiar su regla de compilación
 
 ```makefile
 main.o: persona.o main.cpp
@@ -791,7 +791,7 @@ clean:
 
 Ahora viene la parte final de las librerias, compilar el main binario para hacerlo un ejecutable, haciendo uso de estas. vamos a agregarle las siguientes 
 
-* **-L.** : Lo que hace esta flag es que le dice al compilador que se usara una libreria que esta en esta misma carpeta. **El punto es importantisimo ya que este le indica que esta en la carpeta**.
+* **-L.** : Lo que hace esta flag es que le dice al compilador que se usara una libreria que esta en esta misma carpeta. **El punto es importantísimo ya que este le indica que esta en la carpeta**.
 * **-lnombreLibreria**: Con esto le estamos diciendo al compilador cual es el nombre de la libreria que debe buscar y usar para compilar. en nuestro caso seria ***-lpersona***.
 * **-Wl, ** : Wl es el linker que se usa, no se mucho de este.
 * **-rpath=.** : Esto lo que hace es decirle al linker que añada esta carpeta a donde debe buscar por librerias.
@@ -805,7 +805,7 @@ $(exe): main.o $(lib)
 
 Las dependencias de este van a ser claramente nuestro `main.o` y tambien nuestra libreria que seria `libpersona.dll`.
 
-Finalmente nuestro makefile se veria asi:
+Finalmente nuestro makefile se veria así:
 
 ```makefile
 cc=g++
@@ -832,4 +832,4 @@ clean:
 	rm *.o *.out *.exe *.dll
 ```
 
-Hay que ver que se le agrego el a la regla **run**  la dependecia de la regla **exe** y se añadio al clean un ***.dll*** 
+Hay que ver que se le agrego el a la regla **run**  la dependencia de la regla **exe** y se añadió al clean un ***.dll*** 
