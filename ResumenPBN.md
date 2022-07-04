@@ -226,6 +226,38 @@ int main(){
     return 0;
 }
 ```
+---
+```c++
+#include<iostream>
+using namespace std;
+
+void producto(int x1,int y1,int x2,int y2, int* r1,int *r2){
+//Lo primero que tenemos que notar es que r1 y r2 son punteros de int, estos son los valores en lo que yo guardare la multiplicación de estos vectores.
+    *r1 = x1*y2; //formulas supuestas de una imagen de internet :D
+    *r2 = y2*y1;
+    //se puede ver que guardamos los valores de estas multiplicaciónes en las direcciones apuntadas por r1 y r2, es decir que se modificaron los valores que inicialmente estaban ahi dentro de esta funcion.
+}
+
+int main(){
+    int x1=3;
+    int y1=5;
+    int x2=1;
+    int y2=7;
+    int* r1 = new int;//Notese que no lo definimos como punteros debido a que si lo hicieramos tendriamos que asginar el tamaño con un malloc o un new.
+    int* r2 = new int;
+    
+    cout<<"v1("<<x1<<","<<y1<<")"<<endl;
+    cout<<"v2("<<x2<<","<<y2<<")"<<endl;
+    cout<<"el nuevo vector es"<<endl;
+    producto(x1,y1,x2,y2,r1,r2);//como nosotros le dijimos a nuestra funcion que r1 y r2 son int*, tenemos que pasarle la DIRECCIÓN de estas variables.
+    cout<<"v3("<<*r1<<","<<*r2<<")"<<endl;
+    free(r1);
+    free(r2);
+    return 0;
+}
+```
+
+Aquí hay dos maneras de hacerlo, una es asignando memoria directamente con el `int b` y la otra es trabajando con new, donde new es una palabra reservada a la que después hay que asignarle el tipo de valor.
 
 ## Arreglos de punteros.
 
