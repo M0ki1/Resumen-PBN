@@ -154,6 +154,19 @@ Les dejo una tabla que encontré bonita con los métodos mas importantes **uwu**
 </tbody></table>
 
 ---
+Tambien se puede hacer una concatenación de strings. Para esto primero tenemos que declarar la string
+
+```c++
+#include<string>
+int main(){
+    string palabra = "";
+    //ahora si podemos ir agregando strings a esta variable
+    string+= "hola" + " como" + " estas";
+    return 0;
+}
+```
+
+
 
 # Punteros
 
