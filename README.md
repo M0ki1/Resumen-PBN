@@ -183,72 +183,72 @@ Pequeña imagen que explica un poco lo que dije arriba. Para los strings siempre
 
 ![](https://dyclassroom.com/image/topic/c/pointers-string/str-ptr.jpg)
 
-* ## Doble return en funciones 
+## Doble return en funciones 
 
-  para lograr esto haremos una función que me retorne el producto entre dos "*vectores*"
+para lograr esto haremos una función que me retorne el producto entre dos "*vectores*"
 
-  ```c++
-  #include<iostream>
-  using namespace std;
-  
-  void producto(int x1,int y1,int x2,int y2, int* r1,int *r2){
-  //Lo primero que tenemos que notar es que r1 y r2 son punteros de int, estos son los valores en lo que yo guardare la multiplicación de estos vectores.
-      *r1 = x1*y2; //formulas supuestas de una imagen de internet :D
-      *r2 = y2*y1;
-      //se puede ver que guardamos los valores de estas multiplicaciónes en las direcciones apuntadas por r1 y r2, es decir que se modificaron los valores que inicialmente estaban ahi dentro de esta funcion.
-  }
-  
-  int main(){
-      int x1=3;
-      int y1=5;
-      int x2=1;
-      int y2=7;
-      int r1;//Notese que no lo definimos como punteros debido a que si lo hicieramos tendriamos que asginar el tamaño con un malloc o un new.
-      int r2;
-      cout<<"v1("<<x1<<","<<y1<<")"<<endl;
-      cout<<"v2("<<x2<<","<<y2<<")"<<endl;
-      cout<<"el nuevo vector es"<<endl;
-      producto(x1,y1,x2,y2,&r1,&r2);//como nosotros le dijimos a nuestra funcion que r1 y r2 son int*, tenemos que pasarle la DIRECCIÓN de estas variables.
-      cout<<"v3("<<r1<<","<<r2<<")"<<endl;
-      return 0;
-  }
-  ```
+```c++
+#include<iostream>
+using namespace std;
 
-* ## Arreglos de punteros.
+void producto(int x1,int y1,int x2,int y2, int* r1,int *r2){
+//Lo primero que tenemos que notar es que r1 y r2 son punteros de int, estos son los valores en lo que yo guardare la multiplicación de estos vectores.
+    *r1 = x1*y2; //formulas supuestas de una imagen de internet :D
+    *r2 = y2*y1;
+    //se puede ver que guardamos los valores de estas multiplicaciónes en las direcciones apuntadas por r1 y r2, es decir que se modificaron los valores que inicialmente estaban ahi dentro de esta funcion.
+}
 
-  ```c++
-  #include<iostream>
-  using namespace std;
-  int TAMAÑO = 5; //esto es una variable local por convencion va en mayuscula uwu
-  int main(){
-      int numeros[] = {5,10,20,30,40};//declaramos un arreglo normal de int
-      int * punteros[TAMAÑO];//declaramos un arreglo de PUNTEROS de INT
-      for (int i =0;i<TAMAÑO;i++){
-          punteros[i] = &numeros[i]//aca vamos recorriendo donde se guardar los punteros y guardamos en cada posición, la direccion de memoria de lo que este en el arreglo numeros, por eso usamos &
-      }
-      for (int i =0;i<TAMAÑO;i++){
-          cout<<"numeros["<<i<<"]"<<"="<<*punteros[i]<<endl;
-          //Finalmente aca leemos con un for las distintas direcciones apuntadas y mostramos el valor por pantalla, el output de esto deberia ser
-          /* array_of_integers[0] = 5 
-             array_of_integers[1] = 10 
-             array_of_integers[2] = 20 
-             array_of_integers[3] = 40 
-             array_of_integers[4] = 80
-              */
-      }
-      
-      return 0;
-  }
-  
-  ```
+int main(){
+    int x1=3;
+    int y1=5;
+    int x2=1;
+    int y2=7;
+    int r1;//Notese que no lo definimos como punteros debido a que si lo hicieramos tendriamos que asginar el tamaño con un malloc o un new.
+    int r2;
+    cout<<"v1("<<x1<<","<<y1<<")"<<endl;
+    cout<<"v2("<<x2<<","<<y2<<")"<<endl;
+    cout<<"el nuevo vector es"<<endl;
+    producto(x1,y1,x2,y2,&r1,&r2);//como nosotros le dijimos a nuestra funcion que r1 y r2 son int*, tenemos que pasarle la DIRECCIÓN de estas variables.
+    cout<<"v3("<<r1<<","<<r2<<")"<<endl;
+    return 0;
+}
+```
 
-  Este caso se ve muy básico e inecesario pero esto mismo se puede aplicar para los structs y objetos.
+## Arreglos de punteros.
 
-  ---
+```c++
+#include<iostream>
+using namespace std;
+int TAMAÑO = 5; //esto es una variable local por convencion va en mayuscula uwu
+int main(){
+    int numeros[] = {5,10,20,30,40};//declaramos un arreglo normal de int
+    int * punteros[TAMAÑO];//declaramos un arreglo de PUNTEROS de INT
+    for (int i =0;i<TAMAÑO;i++){
+        punteros[i] = &numeros[i]//aca vamos recorriendo donde se guardar los punteros y guardamos en cada posición, la direccion de memoria de lo que este en el arreglo numeros, por eso usamos &
+    }
+    for (int i =0;i<TAMAÑO;i++){
+        cout<<"numeros["<<i<<"]"<<"="<<*punteros[i]<<endl;
+        //Finalmente aca leemos con un for las distintas direcciones apuntadas y mostramos el valor por pantalla, el output de esto deberia ser
+        /* array_of_integers[0] = 5 
+           array_of_integers[1] = 10 
+           array_of_integers[2] = 20 
+           array_of_integers[3] = 40 
+           array_of_integers[4] = 80
+            */
+    }
+    
+    return 0;
+}
 
-  # Structs
+```
 
-  Principalmente los structs son una forma de almacenar datos de una forma estructurada
+Este caso se ve muy básico e inecesario pero esto mismo se puede aplicar para los structs y objetos.
+
+---
+
+# Structs
+
+Principalmente los structs son una forma de almacenar datos de una forma estructurada
 
 ```c
 #include <stdio.h>
@@ -676,3 +676,8 @@ Aquí realmente no es necesario crear un makefile, podemos ingresar las comandos
    ```
 
    Donde ***\*.out*** es para linux y ***\*.exe*** es para windows.
+
+
+
+# Librerias
+
