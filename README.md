@@ -399,13 +399,280 @@ clean:
 	rm *.o *.out *.exe
 ```
 
-Aplica lo mismo aca con el run, ***\*.out*** es para linux y ***\*.exe*** es para windows.
+Aplica lo mismo acá con el run, ***\*.out*** es para linux y ***\*.exe*** es para windows.
 
 
 
 # Clases (objetos)
 
-Mismo concepto que los structs solo que acá se pueden crear metodos(funciones) y tienen sus variables. Esto es solo en C++.
+Mismo concepto que los structs solo que acá se pueden crear metodos(funciones) y tienen sus atributos (variables) Esto es solo en C++.
+
+Para poder usar estos si o si necesitamos un archivo `.h` y un archivo `.cpp` para partir haciendo esto vamos a declarar nuestra clase.
+
+## Persona.h
+
+De primera mano crearemos un ***header*** donde declararemos nuesta clase, como ya hablamos antes, las clases tiene ***Metodos*** y ***Atributos***, estos pueden ser **publicos** o **privados**. cuando son publicos, cualquier persona, incluyendo el usuario puede modificarlos y/o usarlos, en cambio si son privados solo pueden modificarse dentro de la misma clase. **Por lo general yo dejo los atributos en private y los metodos en public**.
+
+```c++
+#include<string>
+class Persona{
+    private:
+    string nombre;
+    int edad;
+    float altura;
+    public:
+    Persona(string nombre, int edad,float altura);//constructor con argumentos
+    Persona();//constructor sin argumentos
+    void saludar();//Como los atributos estan en private, tenemos que hacer los Setters
+    			   //y los getters
+    void setNombre(string nombre);
+    void setEdad(int edad);
+    void setAltura(float altura);
+    //Y ahora hacemos los getters
+    string getNombre();
+    int getEdad();
+    float getAltura();    
+}
+```
+
+## Persona.cpp
+
+Lo primero que tenemos que hacer es crear un **constructor**.
+
+### Constructor con parametros.
+
+----
+
+El primero que haremos será uno con los atributos pasados directamente. Cabe recalcar que un constructo es algo que nos genera la clase (objeto).
+
+```c++
+#include"persona.h"//Añadimos los headers en el que declaramos la clase y adicionalmente
+#include<iostream> //los que usaremos para el funcionamiento de la clase
+#include<string>
+using namespace std;
+//Para poder crear los metodos de la clase se debe usar la notacion 
+//NombreClase::NombreMetodo. 
+//Aca como es el constructor le digo NombreClase::NombreConstructor
+// En lo personal les pongo el mismo nombre a la clase y el constructor. y por convencion la primera letra en mayuscula
+Persona::Persona(string nombre,float altura,int edad){
+    this->nombre = nombre; //Con el this, le indicamos a el programa se esta haciendo referencia asi si mismo, para que no haya problemas con el repetir nombres al asignar
+    this->altura = altura;
+    this->edad = edad;
+}
+```
 
 
 
+### Constructor sin parametros.
+
+---
+
+Aquí usaremos el concepto de ***sobrecarga*** es decir, llamaremos de igual forma otro constructor pero no le daremos parametros, para asi instanciar una persona **sin** nombre **ni** edad **ni** altura.
+
+```c++
+#include"persona.h" //Incluimos el header de nuestra clase y lo necesario para sus
+#include<iostream>  //metodos
+using namespace std;
+
+Persona::Persona(){
+    this->nombre="";
+    this->edad=0;
+    this->altura = 0.0;
+}
+```
+
+### Setters.
+
+---
+
+Ahora haremos los setters, cabe destacar que como nuestros atributos son private, no podemos acceder directamente a estos ni para leerlos ni para escribirlos, es por eso que les creamos metodos que nos permitan hacer estas acciones y van dentro de nuestro archivo `.cpp`.
+
+```c++
+//recuerden que seguimos trabajando en persona.cpp
+#include"persona.h" //Incluimos el header de nuestra clase y lo necesario para sus
+#include<iostream>//metodos
+#include<string>
+using namespace std;
+void Persona::setNombre(string nombre){
+    this->nombre = nombre; // asi de sencillo asignamos el nombre con nuestro setter
+}
+void Persona::setEdad(int edad){
+    this->edad = edad; // asi de sencillo asignamos la edad con nuestro setter
+}
+void Persona::setAltura(float altura){
+    this->altura = altura; // asi de sencillo asignamos la altura con nuestro setter
+}
+```
+
+Cabe destacar que como se esta **asignando** algo, nuestra funcion retorna ***void***. 
+
+### Getters.
+
+---
+
+Mismo concepto, como son privados los atributos, no podemos leerlos, así que creamos los getters para poder mostrarlos cuando sean necesarios. también dentro de nuestro archivo `.cpp`.
+
+```c++
+//recuerden que seguimos trabajando en persona.cpp
+#include"persona.h" //Incluimos el header de nuestra clase y lo necesario para sus
+#include<iostream>//metodos
+#include<string>
+using namespace std;
+string Persona::getNombre(){
+    return this->nombre; //asi de simple, retornamos el atributo en cuestion
+}
+int Persona::getEdad(){
+    return this->edad;
+}
+int Persona::getAltura(){
+    return this->altura;
+}
+```
+
+Es importante notar que dependiendo de el tipo de **atributo** que sea,  es lo que va a retornar la función, mucho ojo.
+
+### Metodos.
+
+---
+
+Finalmente con esto ya podemos trabajar con el método especifico que habíamos creado para nuestro objeto que es ***`saludar()`***.
+
+```c++
+//recuerden que seguimos trabajando en persona.cpp
+#include"persona.h" //Incluimos el header de nuestra clase y lo necesario para sus
+#include<iostream>//metodos
+#include<string>
+using namespace std;
+void Persona::saludar(){
+    cout<<"Hola mi nombre es "<<this->nombre<<" mido "<<this->altura<<"m y tengo  "<<this->edad<<" años"<<endl;
+}
+```
+
+### Finalmente.
+
+---
+
+Al final nuestro archivo `persona.cpp` quedaria asi:
+
+```c++
+#include"persona.h" //Incluimos el header de nuestra clase y lo necesario para sus
+#include<iostream>//metodos
+#include<string>
+using namespace std;
+//Constructor con parametros
+Persona::Persona(string nombre,float altura,int edad){
+    this->nombre = nombre; 
+    this->altura = altura;
+    this->edad = edad;
+}
+//constructor sin parametros
+Persona::Persona(){
+    this->nombre="";
+    this->edad=0;
+    this->altura = 0.0;
+}
+//Setters
+void Persona::setNombre(string nombre){
+    this->nombre = nombre; 
+}
+void Persona::setEdad(int edad){
+    this->edad = edad; 
+}
+void Persona::setAltura(float altura){
+    this->altura = altura;
+}
+//Getters
+string Persona::getNombre(){
+    return this->nombre; 
+}
+int Persona::getEdad(){
+    return this->edad;
+}
+int Persona::getAltura(){
+    return this->altura;
+}
+//metodo saludar
+void Persona::saludar(){
+    cout<<"Hola mi nombre es "<<this->nombre<<" mido "<<this->altura<<"m y tengo  "<<this->edad<<" años"<<endl;
+}
+```
+
+
+
+
+
+## Main.cpp
+
+Con todo esto por fin podemos crear nuestro `main.cpp` 
+
+```c++
+#include"persona.h"
+using namespace std;
+Persona p1("matias",21,1.87); //asi se instancia
+p1.saludar();//Hola mi nombre es matias mido 1.87m y tengo 21;
+Persona p2();
+p2.saludar();//Hola mi nombre es mido 0.0m y tengo 0;
+```
+
+Esto seria clases, ahora, como compilamos esto?
+
+## Compilar en binarios.
+
+Aquí realmente no es necesario crear un makefile, podemos ingresar las comandos manualmente pero, en el examen si o si va un makefile asi que:
+
+1. Siempre partan definiendo sus variables.
+
+   ```makefile
+   cc=g++
+   flag=-std=c++11 -Wall -Wextra -Wundef -Werror -Wuninitialized -Winit-self
+   exe=salida
+   ```
+
+2. Vamos por la compilación de nuestra clase primero, recuerden que esta **depende** de el *header* **persona.h y de persona.cpp**
+
+   ```makefile
+   cc=g++
+   flag=-std=c++11 -Wall -Wextra -Wundef -Werror -Wuninitialized -Winit-self
+   exe=salida
+   
+   persona.o: persona.cpp persona.h
+   	$(cc) $(flag) -c persona.cpp -o persona.o
+   ```
+
+   Notemos adicionalmente que le agregue el **`-c`** esto es debido a que persona.cpp no contiene un main así que lo compilaremos como binario.
+
+3. Finalmente con esto ya podemos agregar el main, que depende de **`persona.o`** y **`main.cpp`**. Esto debe ir arriba ya que es nuestra regla principal.
+
+   ```makefile
+   cc=g++
+   flag=-std=c++11 -Wall -Wextra -Wundef -Werror -Wuninitialized -Winit-self
+   exe=salida
+   
+   main: persona.o main.cpp
+   	$(cc) $(flag) main.cpp persona.o -o $(exe)
+   
+   persona.o: persona.cpp persona.h
+   	$(cc) $(flag) -c persona.cpp -o persona.o
+   ```
+
+   Con esto creamos el archivo que necesitamos para poder ejecutarlo.
+
+4. Ahora podemos añadir la regla y clear para poder obtener algunos puntos como se ve en las pautas de examen.
+
+   ```makefile
+   cc=g++
+   flag=-std=c++11 -Wall -Wextra -Wundef -Werror -Wuninitialized -Winit-self
+   exe=salida
+   
+   main: persona.o main.cpp
+   	$(cc) $(flag) main.cpp persona.o -o $(exe)
+   
+   persona.o: persona.cpp persona.h
+   	$(cc) $(flag) -c persona.cpp -o persona.o
+   run: main.o
+   	./$(exe).out
+   clean:
+   	rm *.o *.out *.exe
+   ```
+
+   Donde ***\*.out*** es para linux y ***\*.exe*** es para windows.
