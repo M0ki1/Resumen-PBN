@@ -69,7 +69,7 @@ En otras palabras suponiendo que tenemos un archivo llamado`resumen.h` en nuestr
   ```
 
   Les dejo una tabla con los metodos mas importantes:
-
+  
   <table class="alt">
   <tbody><tr><th>No.</th><th>Function</th><th>Description</th></tr>
   <tr><td>1)</td><td><a href="c-strlen">strlen(string_name)</a></td><td>returns the length of string name.</td></tr>
@@ -80,7 +80,7 @@ En otras palabras suponiendo que tenemos un archivo llamado`resumen.h` en nuestr
   <tr><td>6)</td><td><a href="c-strlwr">strlwr(string)</a></td><td>returns string characters in lowercase.</td></tr>
   <tr><td>7)</td><td><a href="c-strupr">strupr(string)</a></td><td>returns string characters in uppercase.</td></tr>
   </tbody></table>
-
+  
   
 
 ---
@@ -152,7 +152,6 @@ Les dejo una tabla que encontré bonita con los métodos mas importantes **uwu**
 </td>
 </tr>
 </tbody></table>
-
 
 ---
 
@@ -279,6 +278,7 @@ Ok los headers son archivos con una extención `.h` que nos permite declarar fun
 ---
 
 ```c++
+
 
 
 int suma(int x,int y);
@@ -833,3 +833,173 @@ clean:
 ```
 
 Hay que ver que se le agrego el a la regla **run**  la dependencia de la regla **exe** y se añadió al clean un ***.dll*** 
+
+# Librerías con swig.
+
+Literalmente ni me voy a meter con que es swig, solo se que genera mucho código para facilitar la creación de librerías para distintos lengujes.
+
+## Creación de archivo.i
+
+Lo primero que tenemos que hacer es generar un archivo.i, realmente es una estructura que debes aprender simplemente.
+
+```swig
+%module NombreDelModuloEnPython
+%{
+#include"Header.h"
+%}
+%include"Header.h"
+```
+
+Realmente esto lo podemos reducir a tres partes
+
+### 1.- Nombre del modulo en Python.
+
+Es la primera parte que se escribe y es bastante descriptivo, en función de esto será como nosotros llamaremos a la función desde Python.
+
+**personas.i**
+
+```swig
+%module Personas
+```
+
+**Test.py**
+
+```python
+import Personas as Per
+```
+
+Bastante derechito.
+
+### 2.-Headers.
+
+Básicamente acá debes **agregar los headers** que hayas ocupado, también puedes hacer código en esta pequeña parte pero no es del todo recomendable.
+
+```swig
+%{
+#include"persona.h"
+%}
+```
+
+### 3.-Headers a importar, tambien de C++.
+
+Acá debes **volver a agregar tus módulos** y en caso de hacer algo adicional como mostrar un ***cout*** directo a Python importar las librerías correspondientes.
+
+```swig
+%include"persona.h"
+```
+
+Con esto tienes tu archivo.i hecho, se vería así.
+
+```swig
+%module Personas
+
+%{
+#include"persona.h"
+%}
+
+%include"persona.h"
+```
+
+## Finalmente, creación del makefile
+
+### Variables makefile.
+
+---
+
+De primera mano vamos a crear las variables necesarias para que el makefile funcione:
+
+* CC = El compilador, algo clásico ya.
+
+* rutaPython = La ruta de el python que tengamos.
+
+* rutaSwig = La ruta donde tengamos instalados Swig.
+
+* libreria: el nombre de la libreria pero con extensión ***.pyd***.
+
+  Esto se veria así:
+
+  ```makefile
+  CC = g++
+  rutaPython = en el examen lo dejamos vacio jaja
+  rutaSwig = en el examen lo dejamos vacio jaja x2
+  libreria = _persona.pyd // es importante poner el guión bajo.
+  ```
+
+  
+
+### Back to basic.
+
+Para  compilar una librería en Swig primero tenemos que hacer las reglas para c**ompilar en binarios nuestros headers**, es MUY importante recordar que t**odos los headers deben ser dependencias de los otros**, es decir que dependan de sus `.o` ya que los **queremos compilar a una librería**, en el ejemplo solo tengo un header, por eso hare una sola regla.
+
+```makefile
+CC = g++
+rutaPython = en el examen lo dejamos vacio jaja
+rutaSwig = en el examen lo dejamos vacio jaja x2
+libreria = _persona.pyd // es importante poner el guión bajo.}
+
+persona.o:persona.h persona.cpp
+	$(CC) -fPIC -c persona.cpp -o persona.o
+```
+
+Destáquese que le agregue el `-fPIC` ya que es una Liberia.
+
+### archivo lib_wrap.cxx
+
+Para ahora armar nuestro archivo, debemos darle la indicación a swig de que nos compile la libreria, esto se hace de la siguiente forma.
+
+```makefile
+lib_wrap.cxx: dependencias.h masDependencias.h archivo.i
+	$(rutaSwig)/swig -python -c++ archivo.i
+	
+```
+
+Acá necesitamos le damos de regla los headers y adicionalmente nuestro `arhivo.i` le indicamos que será un modulo de `-python` escrito en `-c++` mediante las flags.
+
+En el ejemplo de personas se veria así:
+
+```makefile
+persona_wrap.cxx: persona.h persona.i
+	$(rutaSwig)/swig -python -c++ persona.i
+```
+
+### Finalmente la regla de la liberia.
+
+Para terminar nos queda hacer una regla con el **nombre** de la variable que usamos para **lib**( `$(lib)` ) donde las dependencias serán `lib_wrap.cxx` y también los binarios de nuestros headers (`.o`).
+
+```makefile
+$(lib):lib_wrap.cxx dependencias.o masDependencias.o 
+	$(cc) -fPIC -c lib_wrap.cxx -o lib_wrap.o -I$(rutaPython)/include
+    $(cc) -shared lib_wrap.o dependencias.o masDependencias.o -o $(lib) -L$(rutaPython) -lpython39 #aca va la version que tengan
+```
+
+esto seria todo  para compilar, realemente no hay mucho que explicar mas que decir que de primera mano **no se ponen flags** por que si no, no compila y que cambien la version de python, en el examen dara igual la que pongan asumo.
+
+Finalmente para rematar, el ejemplo de las personas.
+
+```makefile
+$(lib):persona_wrap.cxx persona.o
+	$(cc) -fPIC -c persona_wrap.cxx -o persona_wrap.o -I$(rutaPython)/include
+    $(cc) -shared persona_wrap.o persona.o -o $(lib) -L$(rutaPython) -lpython39
+```
+
+
+
+finalmente el makefile quedaría así:
+
+```makefile
+CC = g++
+rutaPython = en el examen lo dejamos vacio jaja
+rutaSwig = en el examen lo dejamos vacio jaja x2
+libreria = _persona.pyd
+
+$(lib):persona_wrap.cxx persona.o
+	$(cc) -fPIC -c persona_wrap.cxx -o persona_wrap.o -I$(rutaPython)/include
+    $(cc) -shared persona_wrap.o persona.o -o $(lib) -L$(rutaPython) -lpython39
+
+lib_wrap.cxx: dependencias.h masDependencias.h archivo.i
+	$(rutaSwig)/swig -python -c++ archivo.i
+
+persona.o:persona.h persona.cpp
+	$(CC) -fPIC -c persona.cpp -o persona.o
+```
+
